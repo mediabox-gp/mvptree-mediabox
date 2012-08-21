@@ -52,7 +52,7 @@ int main(int argc, char **argv)
         switch (option)
         {
         case 'f':
-            mvp_filename = strdup(optarg);
+            mvp_filename = optarg;
             break;              
         case '?':
             if (optopt == 'f')
@@ -161,9 +161,6 @@ cleanup:
         free(files[i]);
     }
     free(files);
-
-    if (mvp_filename != NULL)
-        free(mvp_filename);
 
     return retval;
 }
