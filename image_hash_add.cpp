@@ -24,8 +24,8 @@ void print_usage()
 
 
 #define MVP_BRANCHFACTOR 2
-#define MVP_PATHLENGTH   5 
-#define MVP_LEAFCAP      25 
+#define MVP_PATHLENGTH   5
+#define MVP_LEAFCAP      25
 
 float hamming_distance_cb(MVPDP *pointA, MVPDP *pointB)
 {
@@ -33,12 +33,12 @@ float hamming_distance_cb(MVPDP *pointA, MVPDP *pointB)
     {
         return -1.0f;
     }
-    
+
     uint64_t a = *((uint64_t*)pointA->data);
     uint64_t b = *((uint64_t*)pointB->data);
 
     int res = ph_hamming_distance(a, b);
-    
+
     return (float)res;
 }
 
@@ -46,14 +46,14 @@ int main(int argc, char **argv)
 {
     int option = 0;
     char *mvp_filename = NULL;
-  
+
     while ((option = getopt (argc, argv, "f:")) != -1)
     {
         switch (option)
         {
         case 'f':
             mvp_filename = optarg;
-            break;              
+            break;
         case '?':
             if (optopt == 'f')
                 fprintf (stderr, "Option -%c requires an argument.\n", optopt);
@@ -69,29 +69,30 @@ int main(int argc, char **argv)
             return -1;
         }
     }
-    
+
+    // retval legend: -1 = critical error, 0 = all ok, 1 = errors encountered (non critical)
     int retval = -1;
     int nbfiles = argc - optind;
     if (nbfiles < 1)
     {
         print_usage();
-        return -1;    
+        return -1;
     }
-    
+
     printf ("%d files\n", nbfiles);
     char **files = (char**)malloc(nbfiles*sizeof(*files));
     assert(files);
     for (int i = 0; i != nbfiles; ++i)
     {
-        files[i] = strdup(argv[i+optind]);	
-    } 
+        files[i] = strdup(argv[i+optind]);
+    }
 
     MVPDP **points = (MVPDP**)malloc(nbfiles*sizeof(MVPDP*));
     assert(points);
-    
+
     MVPError err;
     CmpFunc distance_func = hamming_distance_cb;
-    
+
     MVPTree *tree = NULL;
     if (mvp_filename != NULL)
     {
@@ -99,22 +100,22 @@ int main(int argc, char **argv)
                                                                              MVP_LEAFCAP, &err);
         assert(tree);
     }
-    
+
     int num_errors = 0;
     int count = 0;
     ulong64 hashvalue;
     for (int i=0; i != nbfiles; ++i)
     {
         char *name = strrchr(files[i],'/')+1;
-        
+
         if (ph_dct_imagehash(files[i], hashvalue) < 0)
         {
-            printf("Unable to get hash value.\n");
+            printf("Unable to get hash value (file: '%s' )\n", files[i]);
             num_errors++;
             continue;
         }
         printf("@,%016llx,%s\n", (unsigned long long)hashvalue, name);
-        
+
         points[count] = dp_alloc(MVP_UINT64ARRAY);
         points[count]->id = strdup(name);
         points[count]->data = malloc(1*UINT64ARRAY);
@@ -122,8 +123,8 @@ int main(int argc, char **argv)
         memcpy(points[count]->data, &hashvalue, UINT64ARRAY);
         count++;
     }
-    
-    if (num_errors == 0)
+
+    if (count > 0)
     {
         if (tree != NULL)
         {
@@ -133,7 +134,7 @@ int main(int argc, char **argv)
                 printf("Unable to add hash values to tree.\n");
                 goto cleanup;
             }
-        
+
             printf("Saving file '%s' ...\n", mvp_filename);
             error = mvptree_write(tree, mvp_filename, 00755);
             if (error != MVP_SUCCESS)
@@ -143,8 +144,8 @@ int main(int argc, char **argv)
             }
         }
         printf("DONE\n\n");
-        
-        retval = 0; // SUCCESS
+
+        retval = (num_errors > 0) ? 1 : 0; // Update return value
     }
     else
     {
@@ -155,7 +156,7 @@ int main(int argc, char **argv)
 cleanup:
     if (tree != NULL)
         mvptree_clear(tree, free);
-        
+
     for (int i=0; i != nbfiles; ++i)
     {
         free(files[i]);
