@@ -124,6 +124,11 @@ int main(int argc, char **argv)
         count++;
     }
 
+    if (num_errors > 0)
+    {
+        printf("%d errors encountered\n", num_errors);
+    }
+
     if (count > 0)
     {
         if (tree != NULL)
@@ -147,11 +152,6 @@ int main(int argc, char **argv)
 
         retval = (num_errors > 0) ? 1 : 0; // Update return value
     }
-    else
-    {
-        printf("%d errors\n", num_errors);
-    }
-
 
 cleanup:
     if (tree != NULL)
