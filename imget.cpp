@@ -1,6 +1,6 @@
 /*
 
-    MVPTree c library 
+    MVPTree c library
     Copyright (C) 2008-2009 Aetilius, Inc.
     All rights reserved.
 
@@ -35,8 +35,8 @@ extern "C" {
 }
 
 #define MVP_BRANCHFACTOR 2
-#define MVP_PATHLENGTH   5 
-#define MVP_LEAFCAP      25 
+#define MVP_PATHLENGTH   5
+#define MVP_LEAFCAP      25
 
 static unsigned long long nbcalcs = 0;
 
@@ -90,7 +90,7 @@ int main(int argc, char **argv){
 
     MVPDP **points = (MVPDP**)malloc(nbfiles*sizeof(MVPDP*));
     assert(points);
-    
+
     MVPError err;
     MVPTree *tree = mvptree_read(filename,distance_func,MVP_BRANCHFACTOR, MVP_PATHLENGTH,\
                                                                          MVP_LEAFCAP, &err);
@@ -101,18 +101,18 @@ int main(int argc, char **argv){
 	ulong64 hashvalue;
 	for (int i=0;i < nbfiles;i++){
 	    char *name = strrchr(files[i],'/')+1;
-	    
+
 	    if (ph_dct_imagehash(files[i], hashvalue) < 0){
 		printf("Unable to get hash value.\n");
 		continue;
 	    }
 	    printf("(%d) %llx %s\n", i, (unsigned long long)hashvalue, files[i]);
-	    
+
 	    points[count] = dp_alloc(MVP_UINT64ARRAY);
 	    points[count]->id = strdup(name);
-	    points[count]->data = malloc(1*UINT64ARRAY);
+	    points[count]->data = malloc(1*MVP_UINT64ARRAY);
 	    points[count]->datalen = 1;
-	    memcpy(points[count]->data, &hashvalue, UINT64ARRAY);
+	    memcpy(points[count]->data, &hashvalue, MVP_UINT64ARRAY);
 	    count++;
 	}
 
@@ -135,7 +135,7 @@ int main(int argc, char **argv){
 	    }
 
 	} else if (!strncasecmp(command,"query", 3)){
-	    
+
 	    unsigned int nbresults;
 	    for (int i=0;i<count;i++){
 		printf("\n(%d) looking up %s ...\n", i, files[i]);
@@ -155,7 +155,7 @@ int main(int argc, char **argv){
 		}
 		free(results);
 	    }
-	} 
+	}
     } else if (!strncasecmp(command,"print", 3)){
 	printf("-----------------------print-------------------------\n");
 	mvptree_print(stdout,tree);
