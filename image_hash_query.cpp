@@ -25,8 +25,8 @@ void print_usage()
 }
 
 #define MVP_BRANCHFACTOR 2
-#define MVP_PATHLENGTH   5 
-#define MVP_LEAFCAP      25 
+#define MVP_PATHLENGTH   5
+#define MVP_LEAFCAP      25
 
 float hamming_distance_cb(MVPDP *pointA, MVPDP *pointB)
 {
@@ -34,7 +34,7 @@ float hamming_distance_cb(MVPDP *pointA, MVPDP *pointB)
     {
         return -1.0f;
     }
-    
+
     uint64_t a = *((uint64_t*)pointA->data);
     uint64_t b = *((uint64_t*)pointB->data);
 
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     ulong64 hashvalue = 0;
     float radius = 21;
     const int knearest = 5;
-    
+
     while ((option = getopt (argc, argv, "f:h:i:r:")) != -1)
     {
         switch (option)
@@ -64,10 +64,10 @@ int main(int argc, char **argv)
             break;
         case 'i':
             image_filename = optarg;
-            break;              
+            break;
         case 'r':
             radius = atof(optarg);
-            break;               
+            break;
         case '?':
             if (optopt == 'f' || optopt == 'h' || optopt == 'i' || optopt == 'r')
                 fprintf (stderr, "Option -%c requires an argument.\n", optopt);
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
             return -1;
         }
     }
-    
+
     if (mvp_filename == NULL || (hashvalue == 0 && image_filename == NULL))
     {
         print_usage();
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 
     if (image_filename != NULL)
     {
-        const char *name = strrchr(image_filename, '/') + 1;  
+        const char *name = strrchr(image_filename, '/') + 1;
         if (ph_dct_imagehash(image_filename, hashvalue) < 0)
         {
             return -1;
@@ -101,16 +101,16 @@ int main(int argc, char **argv)
 
     MVPDP *points = dp_alloc(MVP_UINT64ARRAY);
     points->id = strdup("0");
-    points->data = malloc(1*UINT64ARRAY);
+    points->data = malloc(1*MVP_UINT64ARRAY);
     points->datalen = 1;
-    memcpy(points->data, &hashvalue, UINT64ARRAY);
-    
+    memcpy(points->data, &hashvalue, MVP_UINT64ARRAY);
+
     MVPError err;
     CmpFunc distance_func = hamming_distance_cb;
     MVPTree *tree = mvptree_read(mvp_filename, distance_func, MVP_BRANCHFACTOR, MVP_PATHLENGTH,\
                                                                          MVP_LEAFCAP, &err);
     assert(tree);
-    
+
     unsigned int nbresults;
     MVPDP **results = mvptree_retrieve(tree, points, knearest,\
                                                            radius, &nbresults, &err);
@@ -123,7 +123,7 @@ int main(int argc, char **argv)
                 printf(",");
         }
     }
-    
+
     free(results);
     mvptree_clear(tree, free);
 

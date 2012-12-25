@@ -118,9 +118,9 @@ int main(int argc, char **argv)
 
         points[count] = dp_alloc(MVP_UINT64ARRAY);
         points[count]->id = strdup(name);
-        points[count]->data = malloc(1*UINT64ARRAY);
+        points[count]->data = malloc(1*MVP_UINT64ARRAY);
         points[count]->datalen = 1;
-        memcpy(points[count]->data, &hashvalue, UINT64ARRAY);
+        memcpy(points[count]->data, &hashvalue, MVP_UINT64ARRAY);
         count++;
     }
 
