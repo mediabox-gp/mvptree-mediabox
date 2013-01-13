@@ -26,6 +26,7 @@ TEST2	= testmvp2
 TEST3   = imget
 UTIL1	= image_hash_add
 UTIL2	= image_hash_query
+UTIL3   = image_hash_print
 
 LIBRARY	= libmvptree.a
 
@@ -43,7 +44,7 @@ clean :
 	rm -f a.out core *.o *.t
 	rm -f $(LIBRARY) $(UTIL) $(TEST) $(TEST2) $(TEST3)
 
-install : $(HFLS) $(LIBRARY) 
+install : $(HFLS) $(LIBRARY)
 	install -c -m 444 $(HFLS) $(DESTDIR)/include
 	install -c -m 444 $(LIBRARY) $(DESTDIR)/lib
 	$(RANLIB) $(DESTDIR)/lib/$(LIBRARY)
@@ -54,11 +55,11 @@ $(LIBRARY) : $(OBJS)
 
 imget : $(TEST3)
 
-utils : $(UTIL1) $(UTIL2)
+utils : $(UTIL1) $(UTIL2) $(UTIL3)
 
 tests : $(TEST) $(TEST2) $(TEST3)
 
-$(TEST) : $(LIBRARY) $(TEST).o 
+$(TEST) : $(LIBRARY) $(TEST).o
 	rm -f $@
 	$(CC) $(CFLAGS) $(LDFLAGS) $(TEST).o $(LIBRARY) $(DEPS_LIBS)
 	mv a.out $@
@@ -77,7 +78,7 @@ $(TEST3): $(LIBRARY) $(TEST3).o
 	rm -f $@
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TEST3).o : 
+$(TEST3).o :
 	rm -f $@
 	g++ $(CFLAGS) $(CPPFLAGS) -c $(TEST3).cpp -o $@
 
@@ -89,4 +90,9 @@ $(UTIL1): $(LIBRARY) $(UTIL1).o
 $(UTIL2): $(LIBRARY) $(UTIL2).o
 	rm -f $@
 	g++ $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(UTIL2).o $(LIBRARY) $(DEPS_LIBS) $(PHASH_LIBS)
+	mv a.out $@
+
+$(UTIL3): $(LIBRARY) $(UTIL3).o
+	rm -f $@
+	g++ $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(UTIL3).o $(LIBRARY) $(DEPS_LIBS) $(PHASH_LIBS)
 	mv a.out $@

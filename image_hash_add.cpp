@@ -8,11 +8,12 @@
 #include <math.h>
 #include <time.h>
 #include <assert.h>
-#include "pHash.h"
+#include "mb_common.h"
 
 extern "C" {
 #include "mvptree.h"
 }
+
 
 void print_usage()
 {
@@ -22,10 +23,6 @@ void print_usage()
     printf("\n");
 }
 
-
-#define MVP_BRANCHFACTOR 2
-#define MVP_PATHLENGTH   5
-#define MVP_LEAFCAP      25
 
 float hamming_distance_cb(MVPDP *pointA, MVPDP *pointB)
 {
@@ -41,6 +38,7 @@ float hamming_distance_cb(MVPDP *pointA, MVPDP *pointB)
 
     return (float)res;
 }
+
 
 int main(int argc, char **argv)
 {
